@@ -1,7 +1,7 @@
-defmodule AdventOfCode.Day01Test do
+defmodule AdventOfCode.Day01bTest do
   use ExUnit.Case
 
-  import AdventOfCode.Day01
+  import AdventOfCode.Day01b
 
   test "part1" do
     input = """
