@@ -23,7 +23,6 @@ defmodule AdventOfCode.Day03Test do
     assert result == 198
   end
 
-  @tag :skip
   test "part2" do
     input = """
       00100
@@ -41,6 +40,6 @@ defmodule AdventOfCode.Day03Test do
       """
     result = part2(input)
 
-    assert result
+    assert result == 230
   end
 end
