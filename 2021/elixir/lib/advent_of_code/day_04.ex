@@ -2,16 +2,45 @@ defmodule AdventOfCode.Day04 do
   def part1(args) do
     {numbers, boards} = String.split(args, "\n", trim: true) |> numbers_and_boards()
 
-    {[winner | _], n} = Enum.reduce_while(numbers, boards, fn n, b ->
+    {n, [winner | _]} = Enum.reduce_while(numbers, boards, fn n, b ->
       {updated, winners} = play_number(n, b)
       if Enum.count(winners) > 0 do
-        {:halt, {winners, n}}
+        {:halt, {n, winners}}
       else
         {:cont, updated}
       end
     end)
 
     score_board(winner) * n
+  end
+
+
+  def part2(args) do
+    {numbers, boards} = String.split(args, "\n", trim: true) |> numbers_and_boards()
+
+    {n, [loser|_]} = Enum.reduce_while(numbers, boards, fn
+      n, b when length(b) == 1 ->
+        {updated, winners} = play_number(n, b)
+        if updated == winners do
+          {:halt, {n, winners}}
+        else
+          {:cont, updated}
+        end
+      n, b ->
+        {updated, winners} = play_number(n, b)
+        if Enum.count(winners) > 0 do
+          losers = Enum.reject(updated, fn board ->
+            Enum.any?(winners, fn w ->
+              w == board
+            end)
+          end)
+          {:cont, losers}
+        else
+          {:cont, updated}
+        end
+    end)
+
+    score_board(loser) * n
   end
 
   def play_number(n, boards) do
@@ -143,19 +172,6 @@ defmodule AdventOfCode.Day04 do
     board |> Enum.zip() |> Enum.map(&Tuple.to_list/1) |> check_rows()
   end
 
-  # def check_columns(board) do
-  #   firsts = Enum.reduce(data, [], fn
-  #     [{_, true} | tail], acc ->
-  #       [true | acc]
-  #     _ ->
-  #       [acc]
-  #   end)
-
-  #   [Enum.count(board) == Enum.count(firsts) | check_columns()]
-  # end
-
-
-
   defp numbers_and_boards([n | b]) do
     numbers = String.split(n, ",")
       |> Enum.map(&String.to_integer/1)
@@ -169,8 +185,5 @@ defmodule AdventOfCode.Day04 do
 
 
     {numbers, boards}
-  end
-
-  def part2(args) do
   end
 end
