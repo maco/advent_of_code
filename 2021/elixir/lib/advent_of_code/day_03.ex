@@ -47,7 +47,6 @@ defmodule AdventOfCode.Day03 do
     first = Enum.reduce(data, [], fn [h | _], acc ->
       [h | acc]
     end)
-    |> Enum.reverse()
     |> Enum.frequencies()
     |> pick_char(max_or_min)
 
