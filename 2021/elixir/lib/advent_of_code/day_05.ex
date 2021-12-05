@@ -28,12 +28,11 @@ defmodule AdventOfCode.Day05 do
       iex> AdventOfCode.Day05.calculate_points([{7,0}, {7,4}], :with_diagonals)
       [{7,0},{7,1},{7,2},{7,3},{7,4}]
 
-      iex> AdventOfCode.Day05.calculate_points([{9,7}, {7,9}], :no_diagonals)
-      []
-
       iex> AdventOfCode.Day05.calculate_points([{9,7}, {7,9}], :with_diagonals)
       [{9,7}, {8,8}, {7,9}]
 
+      iex> AdventOfCode.Day05.calculate_points([{9,7}, {7,9}], :no_diagonals)
+      []
   """
   def calculate_points([{x,y1},{x,y2}], _) do
     for y <- y1..y2, do: {x, y}
@@ -55,6 +54,5 @@ defmodule AdventOfCode.Day05 do
     parse(args)
     |> Enum.map(&calculate_points(&1, :with_diagonals))
     |> count_dangers()
-
   end
 end
