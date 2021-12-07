@@ -42,11 +42,7 @@ defmodule AdventOfCode.Day05 do
     for x <- x1..x2, do: {x, y}
   end
 
-  def calculate_points([{x1, y1}, {x2, y2}], :with_diagonals) do
-    x = x1..x2
-    y = y1..y2
-    Enum.zip(x, y)
-  end
+  def calculate_points([{x1, y1}, {x2, y2}], :with_diagonals), do: Enum.zip(x1..x2, y1..y2)
 
   def calculate_points(_, :no_diagonals), do: []
 
