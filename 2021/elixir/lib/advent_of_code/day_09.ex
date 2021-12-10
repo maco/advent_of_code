@@ -15,7 +15,7 @@ defmodule AdventOfCode.Day09 do
   def find_low_points(map) do
     Enum.filter(map, fn {{row, col}, this} ->
       [{row - 1, col}, {row + 1, col}, {row, col - 1}, {row, col + 1}]
-      |> Enum.all?(fn point -> Map.get(map, point, nil) >= this end)
+      |> Enum.all?(fn point -> Map.get(map, point, nil) > this end)
     end)
   end
 
@@ -36,14 +36,21 @@ defmodule AdventOfCode.Day09 do
   end
 
   def part2(args) do
+    IO.inspect(args)
     raw_data = parse(args)
     map = generate_map(raw_data)
 
     find_low_points(map)
-    |> Enum.map(fn point -> IO.inspect(point) |> get_basin(map, %{}) |> Enum.count() end)
+    |> Enum.map(fn point ->
+      IO.inspect(point, label: "low point")
+      |> get_basin(map, %{})
+      |> IO.inspect()
+      |> Enum.count()
+      |> IO.inspect
+    end)
     |> Enum.sort(:desc)
     |> Enum.take(3)
-    |> Enum.reduce(1, fn x, acc -> x * acc end)
+    |> Enum.product()
   end
 
   @doc """
@@ -54,18 +61,22 @@ defmodule AdventOfCode.Day09 do
   def get_basin({_, 9}, _, acc), do: acc # ridge
   def get_basin({{row, col} = k, v}, map, acc) when is_map_key(map, k) do
     # this works on a small data set, but it's too inefficient for the big one
+    # IO.inspect(k, label: "searching")
+    updated = Map.put(acc, k, v)
     [{row - 1, col}, {row + 1, col}, {row, col - 1}, {row, col + 1}]
-    |> Enum.filter(fn k -> Map.has_key?(map, k) end)
-    |> Enum.reject(fn k -> Map.has_key?(acc, k) end)
+    # |> Enum.filter(fn k -> Map.has_key?(map, k) end)
+    # |> Enum.reject(fn k -> Map.has_key?(acc, k) end)
     |> Enum.reduce(%{}, fn point, inside_acc ->
       case Map.get(map, point, nil) do
         nil -> inside_acc
         value when value >= v ->
-          get_basin({point, value}, Map.delete(map, k), Map.put(acc, k, v))
+          get_basin({point, value}, Map.delete(map, k), updated)
           |> Map.merge(inside_acc)
         _ -> inside_acc
       end
     end)
+
+
     |> Map.merge(acc)
   end
   def get_basin(_, _, acc), do: acc # edge of the board or already counted

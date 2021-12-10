@@ -30,4 +30,17 @@ defmodule AdventOfCode.Day09Test do
 
     assert result == 1134
   end
+
+  test "bigger part2" do
+    input = """
+    21999432101234
+    39878949212345
+    98567898923434
+    87678967894323
+    98999656789212
+    """
+    result = part2(input)
+
+    assert result == 28 * 9 * 14
+  end
 end

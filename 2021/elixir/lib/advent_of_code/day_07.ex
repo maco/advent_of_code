@@ -50,18 +50,7 @@ defmodule AdventOfCode.Day07 do
   """
   def fuel_calculation(positions, location) do
     Enum.reduce(positions, 0, fn pos, fuel ->
-      new_fuel = abs(location - pos) |> triangular_number()
-      fuel + new_fuel
+      fuel + Enum.sum(1..abs(location - pos))
     end)
-  end
-
-  @doc"""
-      iex> AdventOfCode.Day07.triangular_number(3)
-      6
-      iex> AdventOfCode.Day07.triangular_number(4)
-      10
-  """
-  def triangular_number(x) do
-    Enum.reduce(1..x, 0, fn num, acc -> num + acc end)
   end
 end
