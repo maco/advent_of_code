@@ -10,18 +10,28 @@ defmodule AdventOfCode.Day10 do
   @incomplete_angle 4
 
   def part1(args) do
-    %{{:corrupt, ")"} => paren, {:corrupt, ">"} => angle, {:corrupt, "]"} => square, {:corrupt, "}"} => curly} =
+    %{
+      {:corrupt, ")"} => paren,
+      {:corrupt, ">"} => angle,
+      {:corrupt, "]"} => square,
+      {:corrupt, "}"} => curly
+    } =
       String.split(args, "\n", trim: true)
-    |> Enum.map(fn line ->
-      String.graphemes(line)
-      |> analyze_line
-    end)
-    |> Enum.frequencies()
+      |> Enum.map(fn line ->
+        String.graphemes(line)
+        |> analyze_line
+      end)
+      |> Enum.frequencies()
+      |> Map.merge(
+        %{{:corrupt, ")"} => 0, {:corrupt, ">"} => 0, {:corrupt, "]"} => 0, {:corrupt, "}"} => 0},
+        fn _k, actual, default -> actual end
+      ) # ensure all keys matched above exist here
 
-    @corrupt_paren * paren + @corrupt_square * square + @corrupt_curly * curly + @corrupt_angle * angle
+    @corrupt_paren * paren + @corrupt_square * square + @corrupt_curly * curly +
+      @corrupt_angle * angle
   end
 
-  @doc"""
+  @doc """
       iex> AdventOfCode.Day10.analyze_line(["[","]"])
       {:ok}
 
@@ -38,26 +48,31 @@ defmodule AdventOfCode.Day10 do
       {:incomplete, ["["]}
   """
   def analyze_line(l), do: analyze_line(l, [])
-  def analyze_line([], []), do: {:ok} # valid line
-  def analyze_line([], acc), do: {:incomplete, acc} # still stuff left pushed onto the stack
-  def analyze_line([h|t], acc) when h == "{" or h == "[" or h == "(" or h == "<", do: analyze_line(t, [h|acc])
+  # valid line
+  def analyze_line([], []), do: {:ok}
+  # still stuff left pushed onto the stack
+  def analyze_line([], acc), do: {:incomplete, acc}
 
-  def analyze_line([">"|t], ["<"|acc]), do: analyze_line(t, acc)
-  def analyze_line([")"|t], ["("|acc]), do: analyze_line(t, acc)
-  def analyze_line(["]"|t], ["["|acc]), do: analyze_line(t, acc)
-  def analyze_line(["}"|t], ["{"|acc]), do: analyze_line(t, acc)
-  def analyze_line([h|_], _), do: {:corrupt, h}
+  def analyze_line([h | t], acc) when h == "{" or h == "[" or h == "(" or h == "<",
+    do: analyze_line(t, [h | acc])
+
+  def analyze_line([">" | t], ["<" | acc]), do: analyze_line(t, acc)
+  def analyze_line([")" | t], ["(" | acc]), do: analyze_line(t, acc)
+  def analyze_line(["]" | t], ["[" | acc]), do: analyze_line(t, acc)
+  def analyze_line(["}" | t], ["{" | acc]), do: analyze_line(t, acc)
+  def analyze_line([h | _], _), do: {:corrupt, h}
 
   def part2(args) do
-    scores =String.split(args, "\n", trim: true)
+    scores =
+      String.split(args, "\n", trim: true)
       |> Enum.map(fn line ->
         String.graphemes(line)
         |> analyze_line
       end)
       |> Enum.filter(fn
-          {:incomplete, _} -> true
-          {:ok} -> false
-          {:corrupt, _} -> false
+        {:incomplete, _} -> true
+        {:ok} -> false
+        {:corrupt, _} -> false
       end)
       |> Enum.map(fn {:incomplete, remainder} ->
         complete_line(remainder)
@@ -69,25 +84,25 @@ defmodule AdventOfCode.Day10 do
     Enum.at(scores, floor(num / 2))
   end
 
-  @doc"""
+  @doc """
       iex> AdventOfCode.Day10.complete_line(["{","["])
       ["}","]"]
   """
   def complete_line(l), do: Enum.reverse(complete_line(l, []))
   def complete_line([], acc), do: acc
-  def complete_line(["<"|t], acc), do: complete_line(t, [">"|acc])
-  def complete_line(["("|t], acc), do: complete_line(t, [")"|acc])
-  def complete_line(["["|t], acc), do: complete_line(t, ["]"|acc])
-  def complete_line(["{"|t], acc), do: complete_line(t, ["}"|acc])
+  def complete_line(["<" | t], acc), do: complete_line(t, [">" | acc])
+  def complete_line(["(" | t], acc), do: complete_line(t, [")" | acc])
+  def complete_line(["[" | t], acc), do: complete_line(t, ["]" | acc])
+  def complete_line(["{" | t], acc), do: complete_line(t, ["}" | acc])
 
-  @doc"""
+  @doc """
       iex> AdventOfCode.Day10.score(["}", "}", "]", "]", ")", "}", ")", "]"])
       288957
   """
   def score(chars), do: score(chars, 0)
   def score([], total), do: total
-  def score([")"|t], total), do: score(t, total * 5 + @incomplete_paren)
-  def score(["]"|t], total), do: score(t, total * 5 + @incomplete_square)
-  def score(["}"|t], total), do: score(t, total * 5 + @incomplete_curly)
-  def score([">"|t], total), do: score(t, total * 5 + @incomplete_angle)
+  def score([")" | t], total), do: score(t, total * 5 + @incomplete_paren)
+  def score(["]" | t], total), do: score(t, total * 5 + @incomplete_square)
+  def score(["}" | t], total), do: score(t, total * 5 + @incomplete_curly)
+  def score([">" | t], total), do: score(t, total * 5 + @incomplete_angle)
 end
