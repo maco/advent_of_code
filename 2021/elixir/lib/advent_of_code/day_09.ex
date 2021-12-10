@@ -58,8 +58,13 @@ defmodule AdventOfCode.Day09 do
     |> Enum.filter(fn k -> Map.has_key?(map, k) end)
     |> Enum.reject(fn k -> Map.has_key?(acc, k) end)
     |> Enum.reduce(%{}, fn point, inside_acc ->
-      get_basin({point, Map.get(map, point, nil)}, Map.delete(map, k), Map.put(acc, k, v))
-      |> Map.merge(inside_acc)
+      case Map.get(map, point, nil) do
+        nil -> inside_acc
+        value when value >= v ->
+          get_basin({point, value}, Map.delete(map, k), Map.put(acc, k, v))
+          |> Map.merge(inside_acc)
+        _ -> inside_acc
+      end
     end)
     |> Map.merge(acc)
   end
