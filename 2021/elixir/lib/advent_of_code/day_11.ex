@@ -8,17 +8,6 @@ defmodule AdventOfCode.Day11 do
     flash_total
   end
 
-  # @doc ~S"""
-  #   iex> octopuses = %{{0, 0} => {1, false}, {0, 1} => {1, false}, {0, 2} => {1, false}, {0, 3} => {1, false},
-  #   ...> {0, 4} => {1, false}, {1, 0} => {1, false}, {1, 1} => {9, false}, {1, 2} => {9, false},
-  #   ...> {1, 3} => {9, false}, {1, 4} => {1, false}, {2, 0} => {1, false}, {2, 1} => {9, false},
-  #   ...> {2, 2} => {1, false}, {2, 3} => {9, false}, {2, 4} => {1, false}, {3, 0} => {1, false},
-  #   ...> {3, 1} => {9, false}, {3, 2} => {9, false}, {3, 3} => {9, false}, {3, 4} => {1, false},
-  #   ...> {4, 0} => {1, false}, {4, 1} => {1, false}, {4, 2} => {1, false}, {4, 3} => {1, false},
-  #   ...> {4, 4} => {1, false}}
-  #   iex> AdventOfCode.Day11.do_step(octopuses, 0)
-  #   [{1,1}, {1,2}, {1,3}, {2,1}, {2,2}, {2,3}, {3,1}, {3,2}, {3,3}]
-  # """
   def do_step(grid, flashes) do
     bump_all(grid)
     |> do_flash()
