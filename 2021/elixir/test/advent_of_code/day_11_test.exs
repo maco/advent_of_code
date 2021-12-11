@@ -37,29 +37,26 @@ defmodule AdventOfCode.Day11Test do
     5957959665
     6394862637
     """
-    {result, flashes} = parse(input) |> do_step(0)
+    {result, _flashes} = parse(input) |> do_step(0)
 
-    grid = show_grid(result, "test output")
-
-    # assert grid == """
-    #   8807476555
-    #   5089087054
-    #   8597889608
-    #   8485769600
-    #   8700908800
-    #   6600088989
-    #   6800005943
-    #   0000007456
-    #   9000000876
-    #   8700006848
-    # """
+    show_grid(result, "test output")
   end
 
-  @tag :skip
   test "part2" do
-    input = nil
+    input = """
+    6594254334
+    3856965822
+    6375667284
+    7252447257
+    7468496589
+    5278635756
+    3287952832
+    7993992245
+    5957959665
+    6394862637
+    """
     result = part2(input)
 
-    assert result
+    assert result == 195
   end
 end

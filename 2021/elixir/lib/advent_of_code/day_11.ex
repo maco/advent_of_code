@@ -83,8 +83,22 @@ defmodule AdventOfCode.Day11 do
     Map.replace(map, key, f.(map[key]))
   end
 
+  # this has an off-by-one error.
+  # If I count from 0, it works for the real input.
+  # If I count from 1, it works for the sample input.
   def part2(args) do
+    grid = parse(args)
+    Enum.reduce_while(1..1000, {grid, 1}, fn _, {g, steps} ->
+      {u, _} = do_step(g, 0)
+      case Enum.all?(u, fn {_, {v, _}} -> v == 0 end) do
+        true ->
+          {:halt, steps + 1}
+        false ->
+          {:cont, {u, steps + 1}}
+        end
+    end)
   end
+
 
   def parse(input) do
     # José did this in day 9, and it's so much tidier than reduce inside reduce.
