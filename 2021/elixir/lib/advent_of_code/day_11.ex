@@ -23,8 +23,7 @@ defmodule AdventOfCode.Day11 do
   end
 
   def finalize_flash(grid, flashes) do
-    nines = Enum.filter(grid, fn {_,{v, _}} -> v > 9 end)
-    |> Map.new()
+    nines = Map.filter(grid, fn {_,{v, _}} -> v > 9 end)
     |> Enum.reduce(%{}, fn {k, _}, updated ->
       Map.put(updated, k, {0, false})
     end)
