@@ -4,7 +4,6 @@ defmodule AdventOfCode.Day12Test do
 
   import AdventOfCode.Day12
 
-  @tag :skip
   test "part1 A" do
     input = """
     start-A
@@ -20,7 +19,6 @@ defmodule AdventOfCode.Day12Test do
     assert result == 10
   end
 
-  # @tag :skip
   test "part2" do
     input = """
     start-A

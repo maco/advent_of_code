@@ -4,7 +4,11 @@ defmodule AdventOfCode.Day12 do
   ## (who helped me understand what the heck Guy's code was doing with MapSets)
 
   def part1(args) do
-    edges = String.split(args, "\n", trim: true)
+    find_paths(args, &available_rooms/2)
+  end
+
+  def find_paths(input, available_rooms_func) do
+    edges = String.split(input, "\n", trim: true)
     |> Enum.map(fn line ->
       String.split(line, "-")
     end)
@@ -16,12 +20,11 @@ defmodule AdventOfCode.Day12 do
       Map.put(with_to, from, from_set)
     end)
 
-    walk(graph, ["start"], &available_rooms/2)
+    walk(graph, ["start"], available_rooms_func)
     |> List.flatten()
     |> Enum.filter(&(&1 == "end"))
     |> Enum.count()
   end
-
 
   def walk(graph, [current_room | _previous_rooms] = history, find_available) do
     find_available.(history, Map.get(graph, current_room))
@@ -41,22 +44,7 @@ defmodule AdventOfCode.Day12 do
   end
 
   def part2(args) do
-    edges = String.split(args, "\n", trim: true)
-    |> Enum.map(fn line ->
-      String.split(line, "-")
-    end)
-
-    graph = Enum.reduce(edges, %{}, fn [from, to], paths ->
-      to_set = Map.get(paths, to, MapSet.new()) |> MapSet.put(from)
-      with_to = Map.put(paths, to, to_set)
-      from_set = Map.get(with_to, from, MapSet.new()) |> MapSet.put(to)
-      Map.put(with_to, from, from_set)
-    end)
-
-    walk(graph, ["start"], &available_rooms2/2)
-    |> List.flatten()
-    |> Enum.filter(&(&1 == "end"))
-    |> Enum.count()
+    find_paths(args, &available_rooms2/2)
   end
 
   @doc """
