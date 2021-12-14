@@ -1,6 +1,15 @@
 defmodule AdventOfCode.Day14 do
   def part1(args) do
-    [start, pairs] = String.split(args, "\n\n", trim: true)
+    {start, key} = parse(args)
+
+    {{_, min}, {_, max}} = process_polymer(start, key, 1..10)
+
+    max - min
+  end
+
+  def parse(input) do
+    [start, pairs] = String.split(input, "\n\n", trim: true)
+
     key = String.split(pairs, "\n", trim: true)
     |> Enum.reduce(%{}, fn line, map ->
       [left, right] = String.split(line, " -> ")
@@ -9,8 +18,11 @@ defmodule AdventOfCode.Day14 do
     end)
 
     start = String.graphemes(start)
+    {start, key}
+  end
 
-    {{_, min}, {_, max}} = Enum.reduce(1..10, start, fn _, current ->
+  def process_polymer(start, key, steps) do
+    Enum.reduce(steps, start, fn _, current ->
       Enum.chunk_every(current, 2, 1, :discard)
       |> Enum.map(fn [first, last] ->
         middle = Map.fetch!(key, {first, last})
@@ -19,9 +31,7 @@ defmodule AdventOfCode.Day14 do
       |> tidy()
     end)
     |> Enum.frequencies()
-    |> Enum.min_max_by(fn {letter, quant} -> quant end)
-
-    max - min
+    |> Enum.min_max_by(fn {_letter, quant} -> quant end)
   end
 
   @doc """
@@ -30,9 +40,9 @@ defmodule AdventOfCode.Day14 do
       ["A", "B", "C", "D", "E", "F", "G"]
   """
   def tidy(list), do: do_tidy(list) |> List.flatten()
-  def do_tidy([h|[]]), do: h
+  defp do_tidy([h|[]]), do: h
 
-  def do_tidy([[first, middle, _last] = _h | t]) do
+  defp do_tidy([[first, middle, _last] = _h | t]) do
     [[first, middle] | do_tidy(t) ]
   end
 
