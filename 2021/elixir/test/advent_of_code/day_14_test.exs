@@ -30,11 +30,29 @@ defmodule AdventOfCode.Day14Test do
     assert result == 1588
   end
 
-  @tag :skip
   test "part2" do
-    input = nil
+    input = """
+    NNCB
+
+    CH -> B
+    HH -> N
+    CB -> H
+    NH -> C
+    HB -> C
+    HC -> B
+    HN -> C
+    NN -> C
+    BH -> H
+    NC -> B
+    NB -> B
+    BN -> B
+    BB -> N
+    BC -> B
+    CC -> N
+    CN -> C
+    """
     result = part2(input)
 
-    assert result
+    assert result == 2188189693529
   end
 end
