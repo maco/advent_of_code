@@ -48,6 +48,7 @@ defmodule AdventOfCode.Day14 do
 
   def part2(args) do
     {start, key} = parse(args)
+    first_last = {List.first(start), List.last(start)}
 
     all_zeroes = Map.map(key, fn _ -> 0 end)
     counts = Enum.chunk_every(start, 2, 1, :discard)
@@ -56,7 +57,7 @@ defmodule AdventOfCode.Day14 do
     end)
 
     {min, max} = faster_polymer(counts, key, 1..40)
-    |> find_min_max()
+    |> find_min_max(first_last)
 
     max - min
   end
@@ -110,16 +111,37 @@ defmodule AdventOfCode.Day14 do
   Figures out the most and least common letters and how many
       iex> counts = %{{"N", "N"} => 0, {"N", "C"} => 1, {"C", "N"} => 1, {"N", "B"} => 1,
       ...> {"B","C"} => 1, {"C","H"} => 1, {"H","B"} => 1, {"C", "B"} => 0}
-      iex> AdventOfCode.Day14.find_min_max(counts)
+      iex> AdventOfCode.Day14.find_min_max(counts, {"B", "C"})
       {1, 2}
+
+      iex> counts = %{{"N", "N"} => 0, {"N", "C"} => 1, {"C", "N"} => 1, {"N", "B"} => 1,
+      ...> {"B","C"} => 1, {"C","H"} => 1, {"H","B"} => 1, {"C", "B"} => 0}
+      iex> AdventOfCode.Day14.find_min_max(counts, {"B", "B"})
+      {1, 3}
   """
-  def find_min_max(counts) do
+  def find_min_max(counts, first_last) do
     {{_, min}, {_, max}} = Enum.reduce(counts, %{}, fn {{first, second}, count}, total ->
       Map.update(total, first, count, &(&1 + count))
       |> Map.update(second, count, &(&1 + count))
     end)
     |> Map.map(fn {_, x} -> round(x / 2) end)
+    |> handle_first_last(first_last)
     |> Enum.min_max_by(fn {_letter, quant} -> quant  end)
     {min, max}
   end
+
+    @doc """
+      iex> AdventOfCode.Day14.handle_first_last(%{"B" => 3, "C" => 4, "H" => 5}, {"B", "C"})
+      %{"B" => 3, "C" => 4, "H" => 5}
+
+      iex> AdventOfCode.Day14.handle_first_last(%{"B" => 3, "C" => 4, "H" => 5}, {"B", "B"})
+      %{"B" => 4, "C" => 4, "H" => 5}
+  """
+  def handle_first_last(counts, {a, a}) do
+    as = counts[a]
+    Map.replace(counts, a, as + 1)
+  end
+
+  def handle_first_last(counts, {_first, _last}), do: counts
+
 end
