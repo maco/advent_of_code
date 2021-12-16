@@ -8,25 +8,24 @@ defmodule AdventOfCode.Day15 do
 
     target = {max_r, max_c}
 
-    dijkstra(Map.delete(nodes, {0,0}), nodes, {{0,0}, nodes[{0,0}]}, target)
+    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, target)
   end
 
-  def dijkstra(_unvisited, _nodes, {{r, c}, {_, distance}}, {r, c}), do: distance
+  def dijkstra(_unvisited, {{r, c}, {_, distance}}, {r, c}), do: distance
 
-  def dijkstra(unvisited, nodes, {coord, {label, distance}}, target) do
+  def dijkstra(unvisited, {coord, {label, distance}}, target) do
     neighbors = get_neighbors(unvisited, coord)
     |> Map.map(fn {_, {v, d}} ->
       {v, min(distance + v, d)}
     end)
 
-    updated_nodes = update_distances(nodes, neighbors)
     updated_unvisited = update_distances(unvisited, neighbors)
 
     next = Enum.min_by(updated_unvisited, fn {_, {_, d}}
       -> d
     end)
 
-    dijkstra(Map.delete(updated_unvisited, coord), updated_nodes, next, target)
+    dijkstra(Map.delete(updated_unvisited, coord), next, target)
   end
 
   def update_distances(map, neighbors) do
