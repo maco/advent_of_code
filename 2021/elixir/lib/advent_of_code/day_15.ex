@@ -3,12 +3,16 @@ defmodule AdventOfCode.Day15 do
     nodes = parse(args)
     |> Map.update({0,0}, nil, fn {v, dist} -> {v, 0} end)
 
+    target = get_target(nodes)
+
+    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, target)
+  end
+
+  def get_target(nodes) do
     {{max_r, _}, _} = Enum.max_by(nodes, fn {{r, _c}, _} -> r end)
     {{_, max_c}, _} = Enum.max_by(nodes, fn {{_r, c}, _} -> c end)
 
-    target = {max_r, max_c}
-
-    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, target)
+    {max_r, max_c}
   end
 
   def dijkstra(_unvisited, {{r, c}, {_, distance}}, {r, c}), do: distance
