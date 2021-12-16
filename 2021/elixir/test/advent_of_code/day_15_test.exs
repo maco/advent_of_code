@@ -60,8 +60,7 @@ defmodule AdventOfCode.Day15Test do
     assert String.trim(result) == String.trim(expected)
   end
 
-  # @tag :skip
-  test "big board 1" do
+  test "small board expansion" do
     input = """
     234
     456
@@ -91,8 +90,7 @@ defmodule AdventOfCode.Day15Test do
     assert String.trim(result) == String.trim(expected)
   end
 
-  # @tag :skip
-  test "big board 2" do
+  test "sample board expansion" do
     input = """
     1163751742
     1381373672
@@ -159,17 +157,28 @@ defmodule AdventOfCode.Day15Test do
     67554889357866599146897761125791887223681299833479
     """
 
+
     expanded = parse(input) |> expand_board({10,10})
 
     result = capture_io(fn -> show_grid(expanded) end)
     assert String.trim(result) == String.trim(expected)
   end
 
-  @tag :skip
   test "part2" do
-    input = nil
+    input = """
+    1163751742
+    1381373672
+    2136511328
+    3694931569
+    7463417111
+    1319128137
+    1359912421
+    3125421639
+    1293138521
+    2311944581
+    """
     result = part2(input)
 
-    assert result
+    assert result == 315
   end
 end

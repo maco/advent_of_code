@@ -3,31 +3,31 @@ defmodule AdventOfCode.Day15 do
     nodes = parse(args)
     |> Map.update({0,0}, nil, fn {v, dist} -> {v, 0} end)
 
-    target = get_target(nodes)
+    target = Map.keys(nodes) |> Enum.max()
 
     dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, target)
-  end
-
-  def get_target(nodes) do
-    {{max_r, _}, _} = Enum.max_by(nodes, fn {{r, _c}, _} -> r end)
-    {{_, max_c}, _} = Enum.max_by(nodes, fn {{_r, c}, _} -> c end)
-
-    {max_r, max_c}
   end
 
   def dijkstra(_unvisited, {{r, c}, {_, distance}}, {r, c}), do: distance
 
   def dijkstra(unvisited, {coord, {label, distance}}, target) do
+    IO.puts(Enum.count(unvisited))
     neighbors = get_neighbors(unvisited, coord)
-    |> Map.map(fn {_, {v, d}} ->
-      {v, min(distance + v, d)}
+    |> Map.map(fn
+      {_, {v, :infinity}} ->
+        {v, distance + v}
+      {_, {v, d}} ->
+        {v, min(distance + v, d)}
     end)
 
     updated_unvisited = update_distances(unvisited, neighbors)
 
-    next = Enum.min_by(updated_unvisited, fn {_, {_, d}}
-      -> d
-    end)
+    next = Enum.reject(updated_unvisited, fn
+      {_, {_, :infinity}} ->
+        true
+      _ -> false
+      end)
+      |> Enum.min_by(fn {_, {_, d}} -> d end)
 
     dijkstra(Map.delete(updated_unvisited, coord), next, target)
   end
@@ -47,6 +47,16 @@ defmodule AdventOfCode.Day15 do
   end
 
   def part2(args) do
+    initial = parse(args)
+
+    {max_row, max_col} = target = Map.keys(initial) |> Enum.max()
+
+    nodes = expand_board(initial, {max_row + 1, max_row + 1})
+    |> Map.update({0,0}, nil, fn {v, dist} -> {v, 0} end)
+
+    new_target = Map.keys(nodes) |> Enum.max()
+
+    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, new_target)
   end
 
   def expand_board(board, {max_row, max_col}) do
