@@ -1,41 +1,36 @@
 defmodule AdventOfCode.Day15 do
   def part1(args) do
     nodes = parse(args)
-    |> Map.update({0,0}, nil, fn {v, dist} -> {v, 0} end)
+    |> Map.delete({0,0})
 
     target = Map.keys(nodes) |> Enum.max()
 
-    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, target)
+    queue = PriorityQueue.new()
+    |> PriorityQueue.put(0, {0,0})
+
+    dijkstra(nodes, queue, target)
   end
 
-  def dijkstra(_unvisited, {{r, c}, {_, distance}}, {r, c}), do: distance
+  # def dijkstra(_unvisited, [{k, v} |_], {{r, c}, _weight}, {r, c}), do: v
 
-  def dijkstra(unvisited, {coord, {label, distance}}, target) do
-    IO.puts(Enum.count(unvisited))
-    neighbors = get_neighbors(unvisited, coord)
-    |> Map.map(fn
-      {_, {v, :infinity}} ->
-        {v, distance + v}
-      {_, {v, d}} ->
-        {v, min(distance + v, d)}
-    end)
+  def dijkstra(unvisited, queue, target) do
+    case PriorityQueue.min!(queue) do
+      {total, ^target} -> total
 
-    updated_unvisited = update_distances(unvisited, neighbors)
+      {total, {row, col}} ->
+        smaller_queue = PriorityQueue.delete_min!(queue)
 
-    next = Enum.reject(updated_unvisited, fn
-      {_, {_, :infinity}} ->
-        true
-      _ -> false
-      end)
-      |> Enum.min_by(fn {_, {_, d}} -> d end)
+        # calculate neighbor distances and add to queue
+        new_queue = get_neighbors(unvisited, {row, col})
+        |> Enum.reduce(smaller_queue, fn {loc, weight}, q ->
+          PriorityQueue.put(q, weight + total, loc)
+        end)
 
-    dijkstra(Map.delete(updated_unvisited, coord), next, target)
-  end
+        # remove current from unvisited map to prevent cycles
+        shorter_unvisited = Map.delete(unvisited, {row, col})
 
-  def update_distances(map, neighbors) do
-    Map.merge(map, neighbors, fn _k, {val, d1}, {_, d2} ->
-      {val, min(d1, d2)}
-    end)
+        dijkstra(shorter_unvisited, new_queue, target)
+    end
   end
 
   def get_neighbors(unvisited, {row, col}) do
@@ -49,14 +44,17 @@ defmodule AdventOfCode.Day15 do
   def part2(args) do
     initial = parse(args)
 
-    {max_row, max_col} = target = Map.keys(initial) |> Enum.max()
+    {max_row, max_col} = Map.keys(initial) |> Enum.max()
 
-    nodes = expand_board(initial, {max_row + 1, max_row + 1})
-    |> Map.update({0,0}, nil, fn {v, dist} -> {v, 0} end)
+    nodes = expand_board(initial, {max_row + 1, max_col + 1})
+    |> Map.delete({0,0})
 
-    new_target = Map.keys(nodes) |> Enum.max()
+    target = Map.keys(nodes) |> Enum.max()
 
-    dijkstra(Map.delete(nodes, {0,0}), {{0,0}, nodes[{0,0}]}, new_target)
+    queue = PriorityQueue.new()
+    |> PriorityQueue.put(0, {0,0})
+
+    dijkstra(nodes, queue, target)
   end
 
   def expand_board(board, {max_row, max_col}) do
@@ -85,12 +83,11 @@ defmodule AdventOfCode.Day15 do
   end
 
   def bump_risk(board) do
-    Map.map(board, fn {_, {v, d}} ->
-      new_v = case v do
+    Map.map(board, fn {_, v} ->
+      case v do
         9 -> 1
         n -> n + 1
       end
-      {new_v, d}
     end)
   end
 
@@ -101,7 +98,7 @@ defmodule AdventOfCode.Day15 do
     for {line, row} <- Enum.with_index(lines),
         {number, col} <- Enum.with_index(String.to_charlist(line)),
         into: %{} do
-      {{row, col}, {number - ?0, :infinity}}
+      {{row, col}, number - ?0}
     end
   end
 
@@ -111,7 +108,7 @@ defmodule AdventOfCode.Day15 do
       if col == 0 do
         IO.write("\n")
       end
-      {digit, _} = Map.get(grid, k, '*')
+      digit = Map.get(grid, k, '*')
       IO.write(digit)
     end
     grid
