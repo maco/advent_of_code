@@ -7,6 +7,7 @@ defmodule AdventOfCode.Day16 do
 
   def decode_packet(<<v::3, 4::3, rest::bits>>) do
     IO.puts("decode")
+    IO.inspect({bits_to_integer(<<v>>),4}, label: "{v, t}")
     IO.puts("going to literal")
     {payload, remainder} = literal_value(rest)
     {%{version: v, type: 4, payload: payload}, remainder}
@@ -52,22 +53,24 @@ defmodule AdventOfCode.Day16 do
     {<< m::bits , n::bits >>, remainder}
   end
 
-  def operator(<<0::1, len::15, rest::bits>> = bitlist) do
+  def operator(<<0::1, len::integer-size(15), rest::bits>> = bitlist) do
     # IO.puts("operator")
     IO.puts("by length")
-    len = bits_to_integer(<<len>>) |> IO.inspect(label: "bits in subpackets")
+    IO.inspect(len, label: "bits in subpackets")
     bit_size(rest) |> IO.inspect(label: "remaining bits")
     <<subpackets::size(len)-bits, remainder::bits>> = rest
-    {subpackets_by_bits(subpackets), remainder}
+    {subpackets_by_bits(subpackets), remainder} |> IO.inspect(label: "data from subpacket by bit recursion")
   end
 
-  def operator(<<1::1, subpackets::11, rest::bits>> = bitlist) do
+  def operator(<<1::1, count::11, rest::bits>> = bitlist) do
     # IO.puts("operator")
     IO.puts("by number of packets")
-    IO.inspect(subpackets, label: "count")
+    IO.inspect(count, label: "count")
     IO.inspect(bit_size(bitlist), label: "bitlist size")
     IO.inspect(bit_size(rest), label: "subpacket size")
-    subpackets_by_count(rest, subpackets) |> IO.inspect(label: "operator return")
+    {data, rem} = subpackets_by_count(rest, count)
+    data |> IO.inspect(label: "data from #{count} packets")
+    {data, rem}
   end
 
   def subpackets_by_count(bitlist, 0), do: {[], bitlist}
@@ -76,7 +79,7 @@ defmodule AdventOfCode.Day16 do
     IO.inspect(count, label: "subpacket")
     {data, rest} = decode_packet(bitlist)
     IO.inspect(data, label: "data in subpacket")
-    IO.inspect(rest, label: "rest of decoded subpacket")
+    # IO.inspect(rest, label: "rest of decoded subpacket")
     {subdata, remainder} = subpackets_by_count(rest, count - 1)
     {[ data | subdata], remainder}
   end
@@ -90,7 +93,7 @@ defmodule AdventOfCode.Day16 do
     IO.puts("inspecting a subpacket")
     IO.inspect(bit_size(bitlist), label: "bit size of input")
     {data, remainder} = decode_packet(bitlist) |> IO.inspect(label: "decoded subpacket")
-    [ data | subpackets_by_bits(remainder)] |> IO.inspect
+    [ data | subpackets_by_bits(remainder)]
   end
 
   @doc """
