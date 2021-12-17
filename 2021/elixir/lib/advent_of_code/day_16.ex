@@ -7,12 +7,15 @@ defmodule AdventOfCode.Day16 do
 
   def decode_packet(<<v::3, 4::3, rest::bits>>) do
     {payload, remainder} = literal_value(rest)
-    {%{version: v, type: 4, payload: payload}, remainder}
+    {%{version: v, type: 4, value: payload}, remainder}
   end
 
   def decode_packet(<<v::3, t::3, rest::bits>>) do
     {payload, remainder} = operator(rest)
-    {%{version: v, type: t, payload: payload}, remainder}
+
+    value = math(t, payload)
+
+    {%{version: v, type: t, payload: payload, value: value}, remainder}
   end
 
   @doc """
@@ -85,5 +88,54 @@ defmodule AdventOfCode.Day16 do
   end
 
   def part2(args) do
+    bitlist = String.trim(args) |> Base.decode16!()
+    {data, _} = decode_packet(bitlist)
+    data[:value]
+  end
+
+  def math(0, payload) do
+    Enum.reduce(payload, 0, fn %{value: n}, acc ->
+      acc + n
+    end)
+  end
+
+  def math(1, payload) do
+    Enum.reduce(payload, 1, fn %{value: n}, acc ->
+      acc * n
+    end)
+  end
+
+  def math(2, payload) do
+    Enum.min_by(payload, fn %{value: n} -> n end)
+    |> Map.fetch!(:value)
+  end
+
+  def math(3, payload) do
+    Enum.max_by(payload, fn %{value: n} -> n end)
+    |> Map.fetch!(:value)
+  end
+
+  def math(5, [%{value: v1}, %{value: v2}]) do
+    if v1 > v2 do
+      1
+    else
+      0
+    end
+  end
+
+  def math(6, [%{value: v1}, %{value: v2}]) do
+    if v1 < v2 do
+      1
+    else
+      0
+    end
+  end
+
+  def math(7, [%{value: v1}, %{value: v2}]) do
+    if v1 == v2 do
+      1
+    else
+      0
+    end
   end
 end

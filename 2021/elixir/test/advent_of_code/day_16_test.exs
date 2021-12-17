@@ -55,11 +55,59 @@ defmodule AdventOfCode.Day16Test do
     assert result == 31
   end
 
-  @tag :skip
-  test "part2" do
-    input = nil
+  test "part2 - simple sum" do
+    input = "C200B40A82"
     result = part2(input)
 
-    assert result
+    assert result == 3
+  end
+
+  test "part2 - simple product" do
+    input = "04005AC33890"
+    result = part2(input)
+
+    assert result == 54
+  end
+
+  test "part2 - min" do
+    input = "880086C3E88112"
+    result = part2(input)
+
+    assert result == 7
+  end
+
+  test "part2 - max" do
+    input = "CE00C43D881120"
+    result = part2(input)
+
+    assert result == 9
+  end
+
+  test "part2 - less" do
+    input = "D8005AC2A8F0"
+    result = part2(input)
+
+    assert result == 1
+  end
+
+  test "part2 - greater" do
+    input = "F600BC2D8F"
+    result = part2(input)
+
+    assert result == 0
+  end
+
+  test "part2 - equal" do
+    input = "9C005AC2F8F0"
+    result = part2(input)
+
+    assert result == 0
+  end
+
+  test "part2 - bippity boppity" do
+    input = "9C0141080250320F1802104A08"
+    result = part2(input)
+
+    assert result == 1
   end
 end
