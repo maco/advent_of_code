@@ -1,6 +1,6 @@
 defmodule AdventOfCode.Day16 do
   def part1(args) do
-    bitlist = Base.decode16!(args)
+    bitlist = String.trim(args) |> Base.decode16!()
     {data, _} = decode_packet(bitlist)
     total_versions(data)
   end
@@ -9,13 +9,14 @@ defmodule AdventOfCode.Day16 do
     IO.puts("decode")
     IO.puts("going to literal")
     {payload, remainder} = literal_value(rest)
-    {%{version: v, type: 4, payload: payload},remainder}
+    {%{version: v, type: 4, payload: payload}, remainder}
   end
 
   def decode_packet(<<v::3, t::3, rest::bits>>) do
     IO.puts("decode")
     IO.inspect({bits_to_integer(<<v>>),bits_to_integer(<<t>>)}, label: "{v, t}")
     IO.puts("going to operator")
+    IO.inspect(bit_size(rest), label: "bits remaining")
     {payload, remainder} = operator(rest)
     {%{version: v, type: t, payload: payload}, remainder}
   end
@@ -25,54 +26,59 @@ defmodule AdventOfCode.Day16 do
       {2021, <<0::3>>}
   """
   def literal_value(bitlist) do
-    IO.puts("entering literal")
+    # IO.puts("entering literal")
     {v, remainder} = do_literal_value(bitlist)
 
     size = bit_size(v)
     <<int::size(size)>> = v
-    int
+    int |> IO.inspect(label: "literal")
+    IO.inspect(bit_size(remainder), label: "bits remaining")
 
     {int, remainder}
   end
 
   defp do_literal_value(<<0::1, b::4, rest::bits>>) do
-    IO.puts("literal base")
+    # IO.puts("literal base")
     {<<b::4>>, rest}
   end
 
   defp do_literal_value(<<_::1, b::4, rest::bits>>) do
-    IO.puts("literal recursion")
+    # IO.puts("literal recursion")
     {n, remainder} = do_literal_value(rest)
     m = <<b::4>>
-    IO.inspect(is_bitstring(m), label: "m is bitstring")
-    IO.inspect(bit_size(m), label: "m bit size")
-    IO.inspect(bit_size(<< m::bits , n::bits >>), label: "full bit size")
+    # IO.inspect(is_bitstring(m), label: "m is bitstring")
+    # IO.inspect(bit_size(m), label: "m bit size")
+    # IO.inspect(bit_size(<< m::bits , n::bits >>), label: "full bit size")
     {<< m::bits , n::bits >>, remainder}
   end
 
   def operator(<<0::1, len::15, rest::bits>> = bitlist) do
-    IO.puts("operator")
+    # IO.puts("operator")
     IO.puts("by length")
-    len = bits_to_integer(<<len>>)
+    len = bits_to_integer(<<len>>) |> IO.inspect(label: "bits in subpackets")
+    bit_size(rest) |> IO.inspect(label: "remaining bits")
     <<subpackets::size(len)-bits, remainder::bits>> = rest
-    {subpackets_by_bits(subpackets), <<>>} # remainder should be junk?
+    {subpackets_by_bits(subpackets), remainder}
   end
 
   def operator(<<1::1, subpackets::11, rest::bits>> = bitlist) do
-    IO.puts("operator")
+    # IO.puts("operator")
     IO.puts("by number of packets")
     IO.inspect(subpackets, label: "count")
-    subpackets = subpackets_by_count(rest, subpackets)
-    {subpackets, rest} |> IO.inspect(label: "operator return")
+    IO.inspect(bit_size(bitlist), label: "bitlist size")
+    IO.inspect(bit_size(rest), label: "subpacket size")
+    subpackets_by_count(rest, subpackets) |> IO.inspect(label: "operator return")
   end
 
-  def subpackets_by_count(remainder, 0), do: []
+  def subpackets_by_count(bitlist, 0), do: {[], bitlist}
 
   def subpackets_by_count(bitlist, count) do
     IO.inspect(count, label: "subpacket")
-    {data, remainder} = decode_packet(bitlist)
+    {data, rest} = decode_packet(bitlist)
     IO.inspect(data, label: "data in subpacket")
-    [ data | subpackets_by_count(remainder, count - 1)]
+    IO.inspect(rest, label: "rest of decoded subpacket")
+    {subdata, remainder} = subpackets_by_count(rest, count - 1)
+    {[ data | subdata], remainder}
   end
 
   def subpackets_by_bits(<<>>) do
@@ -82,8 +88,8 @@ defmodule AdventOfCode.Day16 do
 
   def subpackets_by_bits(bitlist) do
     IO.puts("inspecting a subpacket")
-    {data, remainder} = decode_packet(bitlist)
-    IO.inspect(data)
+    IO.inspect(bit_size(bitlist), label: "bit size of input")
+    {data, remainder} = decode_packet(bitlist) |> IO.inspect(label: "decoded subpacket")
     [ data | subpackets_by_bits(remainder)] |> IO.inspect
   end
 
