@@ -41,71 +41,60 @@ defmodule AdventOfCode.Day18 do
       # [[[[0,7],4],[7,[[8,4],9]]],[1,1]]
   """
   def try_explosion(sn) do
-    do_try_explode(sn, 1)
+    do_try_explode(sn, 1, [])
   end
 
-  def do_try_explode([[l,r] | []], depth) do
-    IO.inspect("bottomed out")
-    IO.inspect(depth, label: "depth")
-    [l, r]
-  end
-
-  def do_try_explode([h | []], depth) do
-    IO.inspect("no tail")
-    IO.inspect(depth, label: "depth")
-    case do_try_explode(h, depth) do
-      {:explode, %{left: l, right: r}} ->
-        {}
-      n ->
-        n
-    end
-  end
-
-  def do_try_explode([l, r], 5)  when is_integer(l) and is_integer(r) do
+  def do_try_explode([l, r], 5, result)  when is_integer(l) and is_integer(r) do
     IO.puts("level 4")
     IO.inspect([l,r], label: "4-deep pair")
     # IO.inspect(sn, label: "sn")
     # [l, r] = Enum.find(sn, fn x -> is_list(x) end) |> IO.inspect(label: "explode this")
-    {:explode, %{left: l, right: r}}
+    {:explode, %{left: l, right: r, result: [result | 0]}}
   end
 
-  def do_try_explode([l, r], depth) when is_integer(l) and is_integer(r) do
+  def do_try_explode([l, r], depth, result) when is_integer(l) and is_integer(r) do
     IO.inspect([l, r], label: "2 integers")
     IO.inspect(depth, label: "depth")
     [l, r]
   end
 
-  def do_try_explode([h | t], depth) when is_integer(h) and is_integer(t) do
-    IO.inspect([h | t], label: "integers")
-    IO.inspect(depth, label: "depth")
-    [h | t]
-  end
-
-
-
-  def do_try_explode([h | t], depth) when is_integer(h) do
+  def do_try_explode([h, t], depth, result) when is_integer(h) do
     IO.inspect(h, label: "h")
     IO.inspect(t, label: "with list")
     IO.inspect(depth, label: "depth")
-    [h | do_try_explode(t, depth + 1)]
+    new_t = case do_try_explode(t, depth + 1, result) do
+      {:explode, %{left: l, right: r}} ->
+        new_result = add_to_right(result, l)
+        {:bubble, %{right: r, result: new_result}}
+      n ->
+        n
+    end
+    [h | new_t]
   end
 
-  def do_try_explode([h | t], depth) do
+  def do_try_explode([h, t], depth, result) do
+    IO.puts("[h | t], depth, result")
     IO.inspect(h, label: "h")
     IO.inspect(t, label: "t")
     IO.inspect(depth, label: "depth")
-    do_try_explode(h, depth + 1)
+    case do_try_explode(h, depth + 1, result) do
+      {:explode, %{left: l, right: r}} ->
+        new_result = add_to_right(result, l) |> IO.inspect(label: "after adding left item to right")
+        {:bubble, %{right: r, result: new_result}}
+      {:bubble, %{right: r, result: updated}} ->
+        add_to_left(t, r) |> IO.inspect(label: "after adding right item to left")
+
+      n ->
+        n
+    end
   end
 
   @doc """
-    iex> AdventOfCode.Day18.try_split([[8, 10], 7])
-    [[8, [5,5]], 7]
+    iex> AdventOfCode.Day18.try_split([[[[0,7],4],[15,[0,13]]],[1,1]])
+    [[[[0,7],4],[[7,8],[0,13]]],[1,1]]
 
-    iex> AdventOfCode.Day18.try_split([[8, 10], [6, 13], 7])
-    [[8, [5,5]], [6, 13], 7]
-
-    iex> AdventOfCode.Day18.try_split([[8, 9], [6, 13], 7])
-    [[8, 9], [6, [6,7]], 7]
+    iex> AdventOfCode.Day18.try_split([[[[0,7],4],[[7,8],[0,13]]],[1,1]])
+    [[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]
   """
   def try_split([h, t] = sn)
   when is_integer(h) and h < 10 and is_integer(t) and t < 10
@@ -114,41 +103,73 @@ defmodule AdventOfCode.Day18 do
     sn
   end
 
-  def try_split([h | t] = n) when is_integer(h) and h >= 10 do
+  def try_split([h, t] = n) when is_integer(h) and h >= 10 do
     # IO.inspect(n, label: "with h >= 10")
     left = floor(h/2)
     right = ceil(h/2)
-    [[left, right] | t]
+    [[left, right], t]
   end
 
-  def try_split([h | t] = n) when is_integer(t) and t >= 10 do
+  def try_split([h, t] = n) when is_integer(t) and t >= 10 do
     # IO.inspect(n, label: "with t >= 10")
     left = floor(t/2)
     right = ceil(t/2)
-    [h | [left, right]]
+    [h, [left, right]]
   end
 
-  def try_split([h | t] = n) when is_integer(h) do
+  def try_split([h, t] = n) when is_integer(h) do
     # IO.inspect(n, label: "with h integer")
-    [h | try_split(t)]
+    [h, try_split(t)]
   end
 
-  def try_split([h | t] = n) when is_list(h) do
+  def try_split([h, t] = n) when is_list(h) do
     # IO.inspect(n, label: "with h list")
     case try_split(h) do
-      ^h -> [h | try_split(t)]
-      new -> [new | t]
+      ^h -> [h, try_split(t)]
+      new -> [new, t]
     end
-
   end
 
-  def try_split([h | t]) when is_list(t) do
+
+  def try_split([h, t]) when is_list(t) do
     # IO.inspect(label: "when t list")
-    [h | try_split(t)]
+    [h, try_split(t)]
   end
 
   def try_split(sn) do
     # IO.inspect(sn, label: "hmm")
+  end
+
+    @doc """
+      iex> AdventOfCode.Day18.add_to_right([[[2, 3],4],5], 3)
+      [[[2,3],4],8]
+
+      iex> AdventOfCode.Day18.add_to_right([[[2, 3],4],[5, 6]], 3)
+      [[[2,3],4],[5,9]]
+
+      iex> AdventOfCode.Day18.add_to_right([[[]]], 3)
+      [[[]]]
+  """
+  def add_to_right(r, num) when is_integer(r), do: r + num
+
+  def add_to_right([], _num), do: []
+
+  def add_to_right([l, r], num) do
+    [l, add_to_right(r, num)]
+  end
+
+  @doc """
+      iex> AdventOfCode.Day18.add_to_left([[[[1],2],3],4], 8)
+      [[[[9],2],3],4]
+  """
+  def add_to_left(l, num) when is_integer(l), do: l + num
+
+  def add_to_left([], _num), do: []
+
+  def add_to_left([l,r] = list, num) do
+    IO.puts("add to left")
+    IO.inspect(list, label: "add to")
+    [add_to_left(l, num), r]
   end
 
   def part2(args) do
