@@ -3,22 +3,18 @@
 # puzzle prompt: https://adventofcode.com/2024/day/1
 
 from ...base import StrSplitSolution, answer
+from ...utils.parsing import parse_column_ints
 
 
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 1
 
-    # @answer(1234)
+    @answer(2264607)
     def part_1(self) -> int:
-        list1: list[int] = []
-        list2: list[int] = []
-        total: int = 0
+        [list1, list2] = parse_column_ints(self.input)
 
-        for line in self.input:
-            [first, second] = line.split()
-            list1.append(int(first))
-            list2.append(int(second))
+        total: int = 0
 
         list1.sort()
         list2.sort()
