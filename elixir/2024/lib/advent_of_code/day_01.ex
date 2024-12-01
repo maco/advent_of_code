@@ -13,6 +13,16 @@ defmodule AdventOfCode.Day01 do
 
 
 
-  def part2(_args) do
+  def part2(input) do
+    [list1, list2] =
+      input
+      |> parse_columns_ints()
+
+    list2_freqs = Enum.frequencies((list2))
+
+    Enum.reduce(list1, 0,
+      fn num, acc ->
+        acc + num * Map.get(list2_freqs, num, 0)
+      end)
   end
 end

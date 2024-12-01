@@ -13,7 +13,6 @@ class Solution(StrSplitSolution):
     @answer(2264607)
     def part_1(self) -> int:
         [list1, list2] = parse_column_ints(self.input)
-
         total: int = 0
 
         list1.sort()
@@ -26,7 +25,19 @@ class Solution(StrSplitSolution):
 
     # @answer(1234)
     def part_2(self) -> int:
-        pass
+        [list1, list2] = parse_column_ints(self.input)
+        total: int = 0
+
+        list2_freqs = {}
+        for num in list2:
+            if num in list2_freqs:
+                list2_freqs[num] += 1
+            else:
+                list2_freqs[num] = 1
+
+        for num in list1:
+            total += num * list2_freqs.get(num, 0)
+        return total
 
     # @answer((1234, 4567))
     # def solve(self) -> tuple[int, int]:
