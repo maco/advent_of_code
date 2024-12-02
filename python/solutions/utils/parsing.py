@@ -1,16 +1,10 @@
-# add whatever utilities you'll find useful across multiple solutions
-# import them in a solution using:
-# from ...utils.example import add
-
-
 def parse_column_ints(input: list[str]):
-    columns: list[int] = []
-
-    for line_num, line in enumerate(input):
-        fields = line.split()
-        for index, field in enumerate(fields):
-            if line_num == 0:
-                columns.append([int(field)])
+    result = []
+    for row_num, row in enumerate(input):
+        values = map(int, row.split())
+        for col_num, val in enumerate(values):
+            if row_num == 0:
+                result.append([val])
             else:
-                columns[index].append(int(field))
-    return columns
+                result[col_num].append(val)
+    return result

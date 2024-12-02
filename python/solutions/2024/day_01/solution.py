@@ -4,7 +4,7 @@
 
 from ...base import StrSplitSolution, answer
 from ...utils.parsing import parse_column_ints
-
+from collections import Counter
 
 class Solution(StrSplitSolution):
     _year = 2024
@@ -12,33 +12,17 @@ class Solution(StrSplitSolution):
 
     @answer(2264607)
     def part_1(self) -> int:
-        [list1, list2] = parse_column_ints(self.input)
-        total: int = 0
-
-        list1.sort()
-        list2.sort()
-
-        for (first, second) in zip(list1, list2):
-            total = total + abs(first - second)
-
+        locations = map(sorted, parse_column_ints(self.input))
+        total = 0
+        for val1, val2 in zip(*locations):
+            total += abs(val1 - val2)
         return total
 
-    # @answer(1234)
+    @answer(19457120)
     def part_2(self) -> int:
         [list1, list2] = parse_column_ints(self.input)
-        total: int = 0
-
-        list2_freqs = {}
-        for num in list2:
-            if num in list2_freqs:
-                list2_freqs[num] += 1
-            else:
-                list2_freqs[num] = 1
-
-        for num in list1:
-            total += num * list2_freqs.get(num, 0)
+        freqs = Counter(list2)
+        total = 0
+        for val in list1:
+            total += val * freqs.get(val, 0)
         return total
-
-    # @answer((1234, 4567))
-    # def solve(self) -> tuple[int, int]:
-    #     pass
