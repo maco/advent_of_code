@@ -12,14 +12,13 @@ class Solution(TextSolution):
 
     @answer(161289189)
     def part_1(self) -> int:
-        # input = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))"
         captures = re.findall(r'mul\((\d{1,3}),(\d{1,3})\)', self.input)
         total = 0
         for (x, y) in captures:
             total += int(x) * int(y)
         return total
 
-    # @answer(1234)
+    @answer(83595109)
     def part_2(self) -> int:
         captures = re.findall(r'(mul)\((\d{1,3}),(\d{1,3})\)|(don\'t\(\))|(do\(\))', self.input)
         total = 0
