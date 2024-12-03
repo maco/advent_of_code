@@ -5,6 +5,7 @@
 from ...base import StrSplitSolution, answer
 from collections import deque
 from collections.abc import Callable
+import operator
 
 
 class Solution(StrSplitSolution):
@@ -19,8 +20,8 @@ class Solution(StrSplitSolution):
 
         safe_levels = list(
             filter(
-                lambda row: self.__safe_changing(row, self.__safe_decrease)
-                or self.__safe_changing(row, self.__safe_increase),
+                lambda row: self.__safe_changing(row, operator.lt)
+                or self.__safe_changing(row, operator.gt),
                 levels,
             )
         )
@@ -34,43 +35,42 @@ class Solution(StrSplitSolution):
 
         safe_levels = list(
             filter(
-                lambda row: self.__safe_ish_changing(
-                    row.copy(), [], self.__safe_decrease
-                )
-                or self.__safe_ish_changing(row.copy(), [], self.__safe_increase),
+                lambda row:
+                self.__safe_ish_changing(row.copy(), [], operator.gt)
+                or self.__safe_ish_changing(row.copy(), [], operator.lt),
                 levels,
             )
         )
         return len(safe_levels)
 
-    def __safe_changing(self, values: deque[int], comparator: Callable) -> bool:
+    def __safe_changing(self, values: deque[int], op: Callable) -> bool:
         last = values.popleft()
         for val in values:
-            if not comparator(last, val):
+            if not (op(last, val) and abs(last - val) <= 3):
                 return False
             last = val
         return True
 
     def __safe_ish_changing(
-        self, values: deque[int], seen: list[int], comparator: Callable
+        self, values: deque[int], seen: list[int], op: Callable
     ) -> bool:
         try:
             a = values.popleft()
             b = values.popleft()
-            if comparator(a, b):
+            if op(a, b) and abs(a - b) <= 3:
                 seen.append(a)
                 values.appendleft(b)
-                return self.__safe_ish_changing(values, seen, comparator)
+                return self.__safe_ish_changing(values, seen, op)
             elif seen == []:
                 return self.__safe_changing(
-                    self.__append_head(values, a), comparator
-                ) or self.__safe_changing(self.__append_head(values, b), comparator)
+                    self.__append_head(values, a), op
+                ) or self.__safe_changing(self.__append_head(values, b), op)
             else:
                 last = seen.pop()
                 return self.__safe_changing(
-                    self.__append_head(self.__append_head(values, a), last), comparator
+                    self.__append_head(self.__append_head(values, a), last), op
                 ) or self.__safe_changing(
-                    self.__append_head(self.__append_head(values, b), last), comparator
+                    self.__append_head(self.__append_head(values, b), last), op
                 )
 
         except IndexError:
@@ -80,9 +80,3 @@ class Solution(StrSplitSolution):
         my_copy = values.copy()
         my_copy.appendleft(head)
         return my_copy
-
-    def __safe_increase(self, val1: int, val2: int) -> bool:
-        return val1 < val2 and val2 - val1 <= 3
-
-    def __safe_decrease(self, val1: int, val2: int) -> bool:
-        return val1 > val2 and val1 - val2 <= 3
