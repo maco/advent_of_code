@@ -10,7 +10,7 @@ _require-venv:
 # install dev deps
 @install: _require-venv
   # extra flags make this ~ as fast as I want
-  pip install -r requirements.txt --quiet --disable-pip-version-check
+  uv pip install -r requirements.txt --quiet --disable-pip-version-check
 
 # run linting and typecheking over the solutions
 @lint: _require-venv install

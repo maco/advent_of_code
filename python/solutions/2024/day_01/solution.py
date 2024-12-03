@@ -6,6 +6,7 @@ from ...base import StrSplitSolution, answer
 from ...utils.parsing import parse_column_ints
 from collections import Counter
 
+
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 1

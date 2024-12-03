@@ -17,9 +17,13 @@ class Solution(StrSplitSolution):
         for row in self.input:
             levels.append(deque(map(int, row.split())))
 
-        safe_levels = list(filter(lambda row:
-                             self.__safe_changing(row, self.__safe_decrease) or self.__safe_changing(row, self.__safe_increase),
-                             levels))
+        safe_levels = list(
+            filter(
+                lambda row: self.__safe_changing(row, self.__safe_decrease)
+                or self.__safe_changing(row, self.__safe_increase),
+                levels,
+            )
+        )
         return len(safe_levels)
 
     @answer(665)
@@ -28,9 +32,15 @@ class Solution(StrSplitSolution):
         for row in self.input:
             levels.append(deque(map(int, row.split())))
 
-        safe_levels = list(filter(lambda row:
-                             self.__safe_ish_changing(row.copy(), [], self.__safe_decrease) or self.__safe_ish_changing(row.copy(), [], self.__safe_increase),
-                             levels))
+        safe_levels = list(
+            filter(
+                lambda row: self.__safe_ish_changing(
+                    row.copy(), [], self.__safe_decrease
+                )
+                or self.__safe_ish_changing(row.copy(), [], self.__safe_increase),
+                levels,
+            )
+        )
         return len(safe_levels)
 
     def __safe_changing(self, values: deque[int], comparator: Callable) -> bool:
@@ -41,7 +51,9 @@ class Solution(StrSplitSolution):
             last = val
         return True
 
-    def __safe_ish_changing(self, values: deque[int], seen: list[int], comparator: Callable) -> bool:
+    def __safe_ish_changing(
+        self, values: deque[int], seen: list[int], comparator: Callable
+    ) -> bool:
         try:
             a = values.popleft()
             b = values.popleft()
@@ -50,12 +62,16 @@ class Solution(StrSplitSolution):
                 values.appendleft(b)
                 return self.__safe_ish_changing(values, seen, comparator)
             elif seen == []:
-                return self.__safe_changing(self.__append_head(values, a), comparator) \
-                    or self.__safe_changing(self.__append_head(values, b), comparator)
+                return self.__safe_changing(
+                    self.__append_head(values, a), comparator
+                ) or self.__safe_changing(self.__append_head(values, b), comparator)
             else:
                 last = seen.pop()
-                return self.__safe_changing(self.__append_head(self.__append_head(values, a), last), comparator) \
-                    or self.__safe_changing(self.__append_head(self.__append_head(values, b), last), comparator)
+                return self.__safe_changing(
+                    self.__append_head(self.__append_head(values, a), last), comparator
+                ) or self.__safe_changing(
+                    self.__append_head(self.__append_head(values, b), last), comparator
+                )
 
         except IndexError:
             return True
