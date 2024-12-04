@@ -8,8 +8,17 @@ defmodule AdventOfCode.Parsing do
 
   def parse_rows_ints(input) do
     input
-    |> String.trim()
-    |> String.split("\n")
-    |> Enum.map(fn row -> row |> String.split() |> Enum.map(&String.to_integer/1) end)
+    |> String.split("\n", trim: true)
+    |> Enum.map(&String.split/1)
+  end
+
+  def parse_grid(input) do
+    lines = String.split(input, "\n", trim: true)
+
+    for {line, row} <- Enum.with_index(lines),
+        {letter, col} <- Enum.with_index(String.graphemes(line)),
+        into: %{} do
+      {{row, col}, letter}
+    end
   end
 end

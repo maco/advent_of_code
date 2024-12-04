@@ -48,4 +48,26 @@ defmodule AdventOfCode.Day01Test do
 
     assert expected == parse_rows_ints(input)
   end
+
+  test "parse grid" do
+    input = """
+    ABC
+    DEF
+    GHI
+    """
+
+    expected = %{
+      {0, 0} => "A",
+      {0, 1} => "B",
+      {0, 2} => "C",
+      {1, 0} => "D",
+      {1, 1} => "E",
+      {1, 2} => "F",
+      {2, 0} => "G",
+      {2, 1} => "H",
+      {2, 2} => "I"
+    }
+
+    assert expected == parse_grid(input)
+  end
 end
