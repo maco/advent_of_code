@@ -11,7 +11,7 @@ class Solution(StrSplitSolution):
     _day = 5
     _split_on = ""
 
-    # @answer(5955)
+    @answer((5955, 4030))
     def solve(self) -> int:
         [rules, updates] = reduce(self._split_rules_updates, self.input, [[]])
         self.ruleset = reduce(self._build_ruleset, rules, {})
