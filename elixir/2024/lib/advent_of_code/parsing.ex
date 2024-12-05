@@ -13,6 +13,7 @@ defmodule AdventOfCode.Parsing do
   end
 
   def parse_grid(input) do
+    # Saw José do it similarly in 2021
     lines = String.split(input, "\n", trim: true)
 
     for {line, row} <- Enum.with_index(lines),

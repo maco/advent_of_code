@@ -14,11 +14,6 @@ class Solution(StrSplitSolution):
     def part_1(self) -> int:
         grid = [list(line) for line in self.input]
         width = len(grid[0])
-
-        # diag_mas = self.check_xmas(grid, 0, 4, (operator.add, operator.add))
-        # straight_mas = self.check_xmas(grid, 0, 5, (self._identity, operator.add))
-        # corner = self.count_xmases(grid, 9, 9)
-        # num = self.count_xmases(grid, 9, 1)
         xmases = 0
         # sum(self.count_xmases(grid, row, col) for row in range(0, len(grid)) for col in range(0, width) if grid[row, col] == 'X' )
 
@@ -28,9 +23,25 @@ class Solution(StrSplitSolution):
                     xmases += self.count_xmases(grid, row, col)
         return xmases
 
-    # @answer(1234)
+    @answer(1945)
     def part_2(self) -> int:
-        pass
+        grid = [list(line) for line in self.input]
+        width = len(grid[0])
+        mases = 0
+        front_slash = [(operator.add, operator.sub), (operator.sub, operator.add)]
+        back_slash = [(operator.add, operator.add), (operator.sub, operator.sub)]
+
+        for row in range(1, len(grid) - 1):
+            for col in range(1, width - 1):
+                if grid[row][col] == 'A':
+                    mases += 1 if self._check_corners(grid, row, col, front_slash) and self._check_corners(grid, row, col, back_slash) else 0
+        return mases
+
+    def _check_corners(self, grid, row, col, ops):
+        [(op1, op2), (op3, op4)] = ops
+        letters = {grid[op1(row, 1)][op2(col, 1)], grid[op3(row, 1)][op4(col, 1)]}
+        print(f"{row}, {col}: {letters}")
+        return letters in [{'M', 'S'}, {'S', 'M'}]
 
     def count_xmases(self, grid, row, col):
         directions = [
