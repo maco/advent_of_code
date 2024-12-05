@@ -11,18 +11,19 @@ class Solution(StrSplitSolution):
     _day = 5
     _split_on = ""
 
-    # @answer(1234)
-    def part_1(self) -> int:
+    # @answer(5955)
+    def solve(self) -> int:
         [rules, updates] = reduce(self._split_rules_updates, self.input, [[]])
         self.ruleset = reduce(self._build_ruleset, rules, {})
         updates = list(map(self._process_update, updates))
 
-        good_updates = list(filter(self._find_good_updates, updates))
-        return sum(self._get_center(list(update)) for update in good_updates)
+        (good, bad) = list(reduce(self._find_good_updates, updates, ([], [])))
+        part1 = sum(self._get_center(list(update)) for update in good)
 
-    # @answer(1234)
-    def part_2(self) -> int:
-        pass
+        corrected = list(reduce(self._reorder_pages, bad, []))
+        part2 = sum(self._get_center(list(update)) for update in corrected)
+        return (part1, part2)
+
 
     def _get_center(self, pages: list[int]) -> int:
         center = len(pages) // 2
@@ -32,16 +33,19 @@ class Solution(StrSplitSolution):
         nums = update.split(',')
         return list(map(int, nums))
 
-    def _find_good_updates(self, pages: list[str]) -> bool:
+    def _find_good_updates(self, acc: tuple[list[list[int]], list[list[int]]], pages: list[str]) -> bool:
         seen = set()
+        (good, bad) = acc
         for page in pages:
             if page in self.ruleset:
                 related = self.ruleset[page]
                 for rel in related:
                     if rel in seen:
-                        return False
+                        bad.append(pages)
+                        return (good, bad)
             seen.add(page)
-        return True
+        good.append(pages)
+        return (good, bad)
 
     def _build_ruleset(self, acc: dict, line: str) -> dict:
         [key, val] = list(map(int, line.split("|")))
@@ -58,3 +62,19 @@ class Solution(StrSplitSolution):
         else:
             acc[-1].append(val)
         return acc
+
+    def _reorder_pages(self, acc: list[list[int]], pages: list[int]) -> list[list[int]]:
+        new_order = [pages[0]]
+        for page in pages[1:]:
+            if page in self.ruleset:
+                related = self.ruleset[page]
+                indices = [new_order.index(rel) for rel in related if rel in new_order]
+                if indices == []:
+                    new_order.append(page)
+                else:
+                    new_order.insert(min(indices), page)
+            else:
+                new_order.append(page)
+        acc.append(new_order)
+        return acc
+
