@@ -24,7 +24,7 @@ defmodule AdventOfCode.Day02 do
   defp safe_changing(:inc, [a, b | _tail]) when a >= b, do: false
   defp safe_changing(:dec, [a, b | _tail]) when a <= b, do: false
 
-  defp safe_changing(direction, [a, b | tail]), do: safe_changing(direction, [b | tail])
+  defp safe_changing(direction, [_a, b | tail]), do: safe_changing(direction, [b | tail])
 
   ### safe_ish_changing
   # Recurse through values in the row.
