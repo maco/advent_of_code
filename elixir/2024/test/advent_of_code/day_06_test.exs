@@ -19,11 +19,19 @@ defmodule AdventOfCode.Day06Test do
     41 = part1(input)
   end
 
-  @tag :skip
   test "part2" do
-    input = nil
-    result = part2(input)
-
-    assert result
+    input = """
+    ....#.....
+    .........#
+    ..........
+    ..#.......
+    .......#..
+    ..........
+    .#..^.....
+    ........#.
+    #.........
+    ......#...
+    """
+    6 = part2(input)
   end
 end
