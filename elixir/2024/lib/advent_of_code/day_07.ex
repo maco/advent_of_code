@@ -9,22 +9,31 @@ defmodule AdventOfCode.Day07 do
     |> Enum.reduce(0, fn [test, _], acc -> acc + test end)
   end
 
-  def part2(_args) do
+  def part2(input) do
+    data = parse(input)
+
+    Enum.filter(data, fn [test, nums] ->
+      possible = possible_results(Enum.reverse(nums), [&Kernel.+/2, &Kernel.*/2, &concatenate/2])
+      test in possible
+    end)
+    |> Enum.reduce(0, fn [test, _], acc -> acc + test end)
   end
 
-  def possible_results([x], _), do: [x]
+  defp concatenate(x, y) do
+    Enum.join(Integer.digits(y) ++ Integer.digits(x)) |> String.to_integer()
+  end
 
-  def possible_results([head | tail], operators) do
+  defp possible_results([x], _), do: [x]
+
+  defp possible_results([head | tail], operators) do
     subresults = possible_results(tail, operators)
 
     Enum.flat_map(subresults, fn sub ->
-      Enum.map(operators, fn op ->
-        op.(head, sub)
-      end)
+      Enum.map(operators, fn op -> op.(head, sub) end)
     end)
   end
 
-  def parse(input) do
+  defp parse(input) do
     input
     |> String.split("\n", trim: true)
     |> Enum.map(fn line ->

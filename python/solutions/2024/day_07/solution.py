@@ -12,21 +12,36 @@ class Solution(StrSplitSolution):
     _day = 7
 
     # @answer((1234, 4567))
-    def solve(self) -> tuple[int, int]:
-        lines = []
-        for line in self.input:
-            [test, num_str] = line.split(":")
-            nums = []
-            for index, num in enumerate(num_str.split()):
-                nums.append(int(num))
-            lines.append((int(test), nums))
+    def part_1(self) -> int:
+        lines = self._parse()
 
-        total = sum(
+        return sum(
             line[0]
             for line in lines
             if line[0] in self._possible_results(line[1], [operator.add, operator.mul])
         )
-        return (total, 0)
+
+    def part_2(self) -> int:
+        lines = self._parse()
+
+        return sum(
+            line[0]
+            for line in lines
+            if line[0] in self._possible_results(line[1], [operator.add, operator.mul, self._concatenate])
+        )
+
+    def _parse(self):
+        lines = []
+        for line in self.input:
+            [test, num_str] = line.split(":")
+            nums = []
+            for num in num_str.split():
+                nums.append(int(num))
+            lines.append((int(test), nums))
+        return lines
+
+    def _concatenate(self, x: int, y: int) -> int:
+        return int(str(x) + str(y))
 
     def _possible_results(self, nums: list[int], ops: list[Callable]) -> list[int]:
         current = nums.pop()
@@ -35,7 +50,7 @@ class Solution(StrSplitSolution):
             new_results = []
             for sub in subresults:
                 for op in ops:
-                    new_results.append(op(current, sub))
+                    new_results.append(op(sub, current))
             return new_results
         else:
             return [current]
