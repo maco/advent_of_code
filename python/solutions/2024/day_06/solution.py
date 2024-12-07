@@ -3,14 +3,13 @@
 # puzzle prompt: https://adventofcode.com/2024/day/6
 
 from ...base import StrSplitSolution, answer
-from pprint import pprint
 
 
 class Solution(StrSplitSolution):
     _year = 2024
     _day = 6
 
-    # @answer(1234)
+    @answer(5095)
     def part_1(self) -> int:
         self.grid = [list(line) for line in self.input]
         self.height = len(self.grid)
@@ -18,19 +17,17 @@ class Solution(StrSplitSolution):
         self.seen = set()
         self.vector = (-1, 0)
         self.pos = self._find_start()
-        turns = 0
-        while self._on_board(self.pos) and turns < 10:
+
+        while True:
             self.seen.add(self.pos)
             (row, col) = self.pos
             (row_vec, col_vec) = self.vector
             future_row = row + row_vec
             future_col = col + col_vec
+            if not self._on_board((future_row, future_col)):
+                break
             if self.grid[future_row][future_col] == "#":
-                turns += 1
-                print(f"before: {self.vector}")
                 self._turn()
-                print(f"after: {self.vector}")
-
             else:
                 self.pos = (future_row, future_col)
         return len(self.seen)
@@ -44,12 +41,7 @@ class Solution(StrSplitSolution):
     def _on_board(self, position: tuple[int, int]) -> bool:
         print(position)
         (row, col) = position
-        if row < 0 or col < 0:
-            return False
-        elif row > self.height or col > self.width:
-            return False
-        else:
-            return True
+        return 0 <= row < self.height and 0 <= col < self.width
 
     def _turn(self) -> tuple[int, int]:
         if self.vector == (-1, 0):
@@ -66,6 +58,7 @@ class Solution(StrSplitSolution):
             for col, val in enumerate(line):
                 if val == "^":
                     return (row, col)
+        raise("missing start")
 
     # @answer((1234, 4567))
     # def solve(self) -> tuple[int, int]:
