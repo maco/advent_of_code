@@ -9,7 +9,64 @@ defmodule AdventOfCode.Day06 do
     Enum.count(seen)
   end
 
-  def part2(_args) do
+  def part2(input) do
+    grid = parse_grid(input)
+    start = find_start(grid)
+    vector = {-1, 0}
+    {_seen, loops} = get_loops(grid, start, vector, {%{}, 0})
+    loops
+  end
+
+  defp get_loops(grid, position, vector, {original_seen, loops}) do
+    seen = Map.update(original_seen, position, [vector], fn val -> [vector | val] end)
+
+    case look(grid, position, vector) do
+      {_, nil} ->
+        # off grid, so... we're done
+        # figure out what to return
+        {seen, loops}
+
+      {_new_pos, "#"} ->
+        # already has an obstacle, so just keep going
+        new_vector = turn(vector)
+        get_loops(grid, position, new_vector, {seen, loops})
+
+      {new_pos, _} ->
+        # place an object
+        # then run as normal
+        # which means alter the grid we pass to the next function
+        possible_grid = %{grid | new_pos => "#"}
+
+        case has_loop?(possible_grid, position, vector, original_seen) do
+          true -> get_loops(grid, new_pos, vector, {seen, loops + 1})
+          false -> get_loops(grid, new_pos, vector, {seen, loops})
+        end
+    end
+  end
+
+  defp has_loop?(grid, position, vector, seen) do
+    case is_loop?(position, vector, seen) do
+      true ->
+        true
+
+      false ->
+        case look(grid, position, vector) do
+          {_, nil} ->
+            # off grid
+            false
+
+          {_new_pos, "#"} ->
+            new_vector = turn(vector)
+            has_loop?(grid, position, new_vector, seen)
+
+          {new_pos, _} ->
+            has_loop?(grid, new_pos, vector, seen)
+        end
+    end
+  end
+
+  defp is_loop?(position, vector, seen) do
+    vector in Map.get(seen, position, [])
   end
 
   defp go(grid, position, vector, seen) do
@@ -36,6 +93,7 @@ defmodule AdventOfCode.Day06 do
   defp look(grid, pos, vector) do
     new_pos = calculate_move(pos, vector)
     val = Map.get(grid, new_pos)
+    # val is nil if it's off the grid
     {new_pos, val}
   end
 
@@ -50,25 +108,17 @@ defmodule AdventOfCode.Day06 do
     IO.puts(label)
     keys = Map.keys(grid) |> Enum.sort()
 
-    for {_row, col} = k <- keys do
-      if col == 0 do
-        IO.write("\n")
-      end
-
-      Map.get(grid, k, "*") |> IO.write()
-    end
-
     Enum.reduce(keys, [], fn
-      {_row, 0}, acc ->
-        Enum.reverse(acc) |> Enum.join("") |> IO.write()
-        IO.write("\n")
-        []
+      {_row, 0} = k, acc ->
+        Enum.reverse(acc) |> Enum.join("") |> IO.puts()
+        [Map.get(grid, k, "*")]
 
       k, acc ->
         [Map.get(grid, k, "*") | acc]
     end)
+    |> Enum.reverse()
+    |> IO.puts()
 
-    IO.puts("\n")
     grid
   end
 end
