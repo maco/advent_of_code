@@ -36,4 +36,20 @@ defmodule AdventOfCode.Day06Test do
 
     6 = part2(input)
   end
+
+  test "small loop test" do
+    # LiquidityC on Twitch provided this sample input
+    # to see if how I stored vectors was the issue
+    input = """
+    .#.
+    -+#
+    .|.
+    .|.
+    .|.
+    .^.
+    .#.
+    """
+
+    1 = part2(input)
+  end
 end

@@ -5,7 +5,7 @@ defmodule AdventOfCode.Day06 do
     grid = parse_grid(input)
     start = find_start(grid)
     vector = {-1, 0}
-    {seen, _loops} = get_loops(grid, start, vector, {%{}, 0})
+    seen = go(grid, start, vector, MapSet.new())
     Enum.count(seen)
   end
 
@@ -45,6 +45,8 @@ defmodule AdventOfCode.Day06 do
   end
 
   defp has_loop?(grid, position, vector, seen) do
+    seen = Map.update(seen, position, [vector], fn val -> [vector | val] end)
+
     case is_loop?(position, vector, seen) do
       true ->
         true
@@ -86,6 +88,22 @@ defmodule AdventOfCode.Day06 do
   defp find_start(grid) do
     {key, _val} = Enum.find(grid, fn {_key, val} -> val == "^" end)
     key
+  end
+
+  defp go(grid, position, vector, seen) do
+    seen = MapSet.put(seen, position)
+
+    case look(grid, position, vector) do
+      {_, nil} ->
+        seen
+
+      {_new_pos, "#"} ->
+        new_vector = turn(vector)
+        go(grid, position, new_vector, seen)
+
+      {new_pos, _} ->
+        go(grid, new_pos, vector, seen)
+    end
   end
 
   def show_grid(grid, label) do
