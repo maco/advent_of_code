@@ -33,6 +33,7 @@ defmodule AdventOfCode.Day04Test do
     MAMMMXMMMM
     MXMXAXMASX
     """
+
     9 = part2(input)
   end
 end

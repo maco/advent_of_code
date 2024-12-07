@@ -34,6 +34,7 @@ defmodule AdventOfCode.Day05Test do
     61,13,29
     97,13,75,29,47
     """
+
     143 = part1(input)
   end
 
@@ -68,6 +69,7 @@ defmodule AdventOfCode.Day05Test do
     61,13,29
     97,13,75,29,47
     """
+
     123 = part2(input)
   end
 end

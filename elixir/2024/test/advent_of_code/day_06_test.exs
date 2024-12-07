@@ -16,6 +16,7 @@ defmodule AdventOfCode.Day06Test do
     #.........
     ......#...
     """
+
     41 = part1(input)
   end
 
@@ -32,6 +33,7 @@ defmodule AdventOfCode.Day06Test do
     #.........
     ......#...
     """
+
     6 = part2(input)
   end
 end

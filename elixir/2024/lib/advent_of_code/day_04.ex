@@ -30,10 +30,12 @@ defmodule AdventOfCode.Day04 do
   def part2(input) do
     grid = parse_grid(input)
     a_locations = Map.filter(grid, fn {_key, val} -> val == "A" end)
+
     Enum.count(a_locations, fn {key, _val} -> front_slash(grid, key) and back_slash(grid, key) end)
   end
 
   defp front_slash(_grid, {row, col}) when row == 0 or col == 0, do: false
+
   defp front_slash(grid, {row, col}) do
     letters = {Map.get(grid, {row - 1, col + 1}, nil), Map.get(grid, {row + 1, col - 1}, nil)}
     letters == {"M", "S"} or letters == {"S", "M"}
