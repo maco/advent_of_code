@@ -31,9 +31,7 @@ defmodule AdventOfCode.Day07Test do
     21037: 9 7 18 13
     292: 11 6 16 20
     """
-    # input = "156: 15 6"
-    # result = part2(input)
-    # assert result == 156
+
     11387 = part2(input)
   end
 end
