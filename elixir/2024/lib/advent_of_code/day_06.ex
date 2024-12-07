@@ -5,7 +5,7 @@ defmodule AdventOfCode.Day06 do
     grid = parse_grid(input)
     start = find_start(grid)
     vector = {-1, 0}
-    seen = go(grid, start, vector, MapSet.new())
+    {seen, _loops} = get_loops(grid, start, vector, {%{}, 0})
     Enum.count(seen)
   end
 
@@ -67,22 +67,6 @@ defmodule AdventOfCode.Day06 do
 
   defp is_loop?(position, vector, seen) do
     vector in Map.get(seen, position, [])
-  end
-
-  defp go(grid, position, vector, seen) do
-    seen = MapSet.put(seen, position)
-
-    case look(grid, position, vector) do
-      {_, nil} ->
-        seen
-
-      {_new_pos, "#"} ->
-        new_vector = turn(vector)
-        go(grid, position, new_vector, seen)
-
-      {new_pos, _} ->
-        go(grid, new_pos, vector, seen)
-    end
   end
 
   defp turn({-1, 0}), do: {0, 1}
