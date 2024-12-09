@@ -14,7 +14,6 @@ defmodule AdventOfCode.Day06 do
     start = find_start(grid)
     vector = {-1, 0}
     {_seen, loops} = get_loops(grid, start, vector, {%{}, MapSet.new()})
-    IO.inspect(Enum.sort(loops))
     Enum.count(loops)
   end
 
@@ -25,7 +24,6 @@ defmodule AdventOfCode.Day06 do
       {_, nil} ->
         # off grid, so... we're done
         # figure out what to return
-        # show_loops(grid, seen)
         {seen, loops}
 
       {_new_pos, "#"} ->
@@ -94,28 +92,4 @@ defmodule AdventOfCode.Day06 do
         go(grid, new_pos, vector, seen)
     end
   end
-
-  # defp show_loops(grid, seen) do
-  #   keys = Map.keys(grid) |> Enum.sort()
-
-  #   Enum.reduce(keys, [], fn
-  #     {_row, 0} = k, acc ->
-  #       Enum.reverse(acc) |> Enum.join("") |> IO.puts()
-  #       [Map.get(seen, k, ["*"]) |> List.first() |> vec_arrow]
-
-  #     k, acc ->
-  #       [Map.get(seen, k, ["*"]) |> List.first() |> vec_arrow | acc]
-  #   end)
-  #   |> Enum.reverse()
-  #   |> Enum.map(fn k -> Map.get(seen, k, ["*"]) |> List.first() |> vec_arrow end)
-  #   |> IO.puts()
-
-  #   grid
-  # end
-
-  def vec_arrow({-1, 0}), do: "^"
-  def vec_arrow({0, 1}), do: ">"
-  def vec_arrow({1, 0}), do: "v"
-  def vec_arrow({0, -1}), do: "<"
-  def vec_arrow(_), do: "*"
 end
