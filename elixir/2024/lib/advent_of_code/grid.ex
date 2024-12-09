@@ -39,6 +39,13 @@ defmodule AdventOfCode.Grid do
     {new_pos, val}
   end
 
+  def size(grid) do
+    grid
+    |> Map.keys()
+    |> Enum.sort(:desc)
+    |> List.first()
+  end
+
   defp calculate_move({row, col}, {vec_row, vec_col}), do: {row + vec_row, col + vec_col}
 
   def turn_right({-1, 0}), do: {0, 1}
