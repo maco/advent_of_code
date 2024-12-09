@@ -52,4 +52,15 @@ defmodule AdventOfCode.Day06Test do
 
     1 = part2(input)
   end
+
+  test "very small loop test" do
+    input = """
+    ##.
+    ..#
+    ...
+    ^#.
+    """
+
+    0 = part2(input)
+  end
 end

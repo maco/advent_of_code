@@ -1,5 +1,5 @@
 defmodule AdventOfCode.Day04 do
-  import AdventOfCode.Parsing
+  import AdventOfCode.Grid
 
   def part1(input) do
     operations = [
@@ -14,7 +14,7 @@ defmodule AdventOfCode.Day04 do
     ]
 
     grid = parse_grid(input)
-    x_locations = Map.filter(grid, fn {_key, val} -> val == "X" end)
+    x_locations = find_in_grid(grid, "X", &Kernel.==/2)
 
     Enum.reduce(x_locations, 0, fn {x_pos, _}, total ->
       xmases2 =
@@ -29,7 +29,7 @@ defmodule AdventOfCode.Day04 do
 
   def part2(input) do
     grid = parse_grid(input)
-    a_locations = Map.filter(grid, fn {_key, val} -> val == "A" end)
+    a_locations = find_in_grid(grid, "A", &Kernel.==/2)
 
     Enum.count(a_locations, fn {key, _val} -> front_slash(grid, key) and back_slash(grid, key) end)
   end
