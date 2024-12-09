@@ -39,7 +39,8 @@ defmodule AdventOfCode.Day06 do
         # which means alter the grid we pass to the next function
         possible_grid = %{grid | new_pos => "#"}
 
-        case (not Map.has_key?(seen, new_pos)) and has_loop?(possible_grid, position, vector, original_seen) do
+        case not Map.has_key?(seen, new_pos) and
+               has_loop?(possible_grid, position, vector, original_seen) do
           true -> get_loops(grid, new_pos, vector, {seen, MapSet.put(loops, new_pos)})
           false -> get_loops(grid, new_pos, vector, {seen, loops})
         end
